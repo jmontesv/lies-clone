@@ -1,6 +1,6 @@
 const app = require("express")();
 
-const PORT = process.env.port || 3000;
+const PORT = process.env.port || 5000;
 
 app.get("/", (req, res) => {
   res.send("Bienvenido a la API de lies clone");

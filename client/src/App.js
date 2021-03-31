@@ -1,38 +1,27 @@
 import React, { useRef } from "react";
 import "./App.css";
-import { Form, FormControl, Button } from "react-bootstrap";
+import MainPage from "./components/pages/main_page";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { LobbyProvider } from "./contexts/LobbyProvider";
+import Lobby from "./components/pages/lobby";
 
 function App() {
   const nickNameRef = useRef(null);
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    const nickName = nickNameRef.current.value;
-    console.log("funciona " + nickName);
-  };
-
   return (
     <div className="App">
-      <div className="h-100">
-        <Form
-          className="col-lg-6 offset-lg-3 mt-3 d-flex flex-column"
-          onSubmit={submitHandler}
-        >
-          <Form.Group>
-            <Form.Label>Nick Name</Form.Label>
-            <FormControl
-              type="text"
-              placeholder="MiNickName"
-              ref={nickNameRef}
-            />
-          </Form.Group>
-          <div className="align-self-center">
-            <Button className="mt-2" type="submit" variant="light">
-              Crear Sala
-            </Button>
-          </div>
-        </Form>
-      </div>
+      <LobbyProvider>
+        <Router>
+          <Switch>
+            <Route exact path="/">
+              <MainPage />
+            </Route>
+            <Route path="/lobby">
+              <Lobby />
+            </Route>
+          </Switch>
+        </Router>
+      </LobbyProvider>
     </div>
   );
 }

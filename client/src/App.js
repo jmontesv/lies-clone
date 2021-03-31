@@ -1,23 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useRef } from "react";
+import "./App.css";
+import { Form, FormControl, Button } from "react-bootstrap";
 
 function App() {
+  const nickNameRef = useRef(null);
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    const nickName = nickNameRef.current.value;
+    console.log("funciona " + nickName);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      <div className="h-100">
+        <Form
+          className="col-lg-6 offset-lg-3 mt-3 d-flex flex-column"
+          onSubmit={submitHandler}
         >
-          Learn React
-        </a>
-      </header>
+          <Form.Group>
+            <Form.Label>Nick Name</Form.Label>
+            <FormControl
+              type="text"
+              placeholder="MiNickName"
+              ref={nickNameRef}
+            />
+          </Form.Group>
+          <div className="align-self-center">
+            <Button className="mt-2" type="submit" variant="light">
+              Crear Sala
+            </Button>
+          </div>
+        </Form>
+      </div>
     </div>
   );
 }

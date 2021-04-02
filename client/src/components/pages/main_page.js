@@ -15,9 +15,11 @@ function MainPage() {
     const nickName = nickNameRef.current.value;
     if (nickName) {
       const lobbyId = uuidv4();
+      const hostId = uuidv4();
       setLobby({
         lobbyLeader: nickName,
-        lobbyId,
+        id: lobbyId,
+        hostId,
         players: [nickName],
       });
       history.push("/lobby");

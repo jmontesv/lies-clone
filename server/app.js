@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
 
   socket.on("join-room", (idRoom, idUser) => {
     socket.join(idRoom);
-    console.log("Handshake established!");
+    console.log("Handshake established with " + idUser);
     /* tira exeception en linea 42 y 43  */
     // rooms[idRoom].users.concat(idUser);
     // const user = users.find((user) => user.id === idUser);

@@ -16,9 +16,9 @@ function Lobby() {
 
   return (
     lobby && (
-      <SocketProvider id={lobby.id}>
+      <div>
         <HostDashBoard />
-      </SocketProvider>
+      </div>
     )
   );
 }

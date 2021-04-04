@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const httpServer = require("http").createServer(app);
 const rooms = require("./room.json");
+const users = require("./user.json");
 const options = {
   cors: {
     origin: "http://localhost:3000",
@@ -33,15 +34,15 @@ app.use(roomsRoutes);
 app.use(userRoutes);
 
 io.on("connection", (socket) => {
-  const id = socket.handshake.query.id;
-
-  socket.on("join-room", (idRoom, idUser) => {
+  socket.on("join-room", (idRoom) => {
     socket.join(idRoom);
-    console.log("Handshake established with " + idUser);
-    /* tira exeception en linea 42 y 43  */
-    // rooms[idRoom].users.concat(idUser);
-    // const user = users.find((user) => user.id === idUser);
-    // socket.emit("user-joined", user);
+    // Obtengo el usuario completo
+    const user = users.find((user) => user.socketId === socketId);
+    // Añado el usuario a la sala
+    rooms.forEach((room) => {
+      if (room.id === idRoom) room.users.concat(user);
+    });
+    io.emit(idRoom).to("user-joined", user);
   });
 });
 

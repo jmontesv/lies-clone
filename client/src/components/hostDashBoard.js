@@ -8,20 +8,20 @@ function HostDashBoard() {
   const { lobby } = useLobby();
 
   useEffect(() => {
-    socket && socket.emit("join-room", lobby.id, lobby.hostId);
+    socket && socket.emit("join-room", lobby.id);
   }, [socket]);
 
   const invite = () => {
     navigator.clipboard.writeText(
-      window.location.href.replace("lobby", lobby.lobbyId)
+      `${window.location.href}/${lobby.invitationId}`
     );
   };
 
   return (
     <div>
       <h1>Lobby</h1>
-      <h2>{`Jugadores: ${lobby && lobby.players.length}`}</h2>
-      {lobby && lobby.players.map((player) => <p>{player}</p>)}
+      <h2>{`Jugadores: ${lobby && lobby.users.length}`}</h2>
+      {lobby && lobby.users.map((player) => <p>{player}</p>)}
       <div className="button_container d-flex">
         <Button variant="light" onClick={(e) => invite()}>
           Invitar

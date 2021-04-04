@@ -1,7 +1,8 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Form, FormControl, Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import API from "../../axios";
 import { useLobby } from "../../contexts/LobbyProvider";
 
 function MainPage() {
@@ -9,20 +10,22 @@ function MainPage() {
   const history = useHistory("");
   const { setLobby } = useLobby();
 
+  const createNewLobby = () => {
+    const lobbyId = uuidv4();
+    const invitationId = uuidv4();
+    const newLobby = { id: lobbyId, invitationId };
+    API.post("/rooms", newLobby).then((lobby) => {
+      setLobby(lobby.data);
+      history.push("/lobby");
+    });
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
 
     const nickName = nickNameRef.current.value;
     if (nickName) {
-      const lobbyId = uuidv4();
-      const hostId = uuidv4();
-      setLobby({
-        lobbyLeader: nickName,
-        id: lobbyId,
-        hostId,
-        players: [nickName],
-      });
-      history.push("/lobby");
+      createNewLobby();
     } else {
       alert("Tu NickName no puede estar vacio!");
     }

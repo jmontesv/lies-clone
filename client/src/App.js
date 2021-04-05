@@ -5,24 +5,31 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { LobbyProvider } from "./contexts/LobbyProvider";
 import Lobby from "./components/pages/lobby";
 import { SocketProvider } from "./contexts/SocketProvider";
+import { UserProvider } from "./contexts/UserProvider";
 
 function App() {
   return (
     <div className="App">
-      <LobbyProvider>
+      <UserProvider>
         <SocketProvider>
-          <Router>
-            <Switch>
-              <Route exact path="/">
-                <MainPage />
-              </Route>
-              <Route path="/lobby">
-                <Lobby />
-              </Route>
-            </Switch>
-          </Router>
+          <LobbyProvider>
+            <Router>
+              <Switch>
+                <Route exact path="/">
+                  <MainPage />
+                </Route>
+
+                <Route path="/lobby/">
+                  <Lobby />
+                </Route>
+                <Route path="/:invitationId?/">
+                  <MainPage create_lobby={false} />
+                </Route>
+              </Switch>
+            </Router>
+          </LobbyProvider>
         </SocketProvider>
-      </LobbyProvider>
+      </UserProvider>
     </div>
   );
 }

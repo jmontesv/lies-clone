@@ -1,31 +1,73 @@
 import React, { useEffect, useRef } from "react";
 import { Form, FormControl, Button } from "react-bootstrap";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import API from "../../axios";
 import { useLobby } from "../../contexts/LobbyProvider";
+import { useUser } from "../../contexts/UserProvider";
+import { useSocket } from "../../contexts/SocketProvider";
 
-function MainPage() {
+function MainPage({ create_lobby }) {
   const nickNameRef = useRef(null);
   const history = useHistory("");
-  const { setLobby } = useLobby();
+  const socket = useSocket();
+  const { invitationId } = useParams();
+  const { lobby, setLobby, setUsers } = useLobby();
+  const { setUser } = useUser();
 
-  const createNewLobby = () => {
+  useEffect(() => {
+    if (invitationId) {
+      API.get(`/rooms/${invitationId}`)
+        .then((response) => {
+          console.log(response.data);
+          const newLobby = response.data;
+          setLobby(newLobby);
+          setUsers(newLobby.users);
+        })
+        .catch(() => {
+          history.push("/");
+        });
+    }
+  }, []);
+
+  const createNewLobby = (userName) => {
     const lobbyId = uuidv4();
     const invitationId = uuidv4();
-    const newLobby = { id: lobbyId, invitationId };
-    API.post("/rooms", newLobby).then((lobby) => {
-      setLobby(lobby.data);
+    const userId = uuidv4();
+    const newUser = {
+      socketId: socket.id,
+      userName,
+      isHost: true,
+    };
+    const newLobby = { id: lobbyId, invitationId, users: [] };
+    Promise.all([API.post("/rooms", newLobby), API.post("/register", newUser)])
+      .then(() => {
+        setLobby(newLobby);
+        setUser(newUser);
+        history.push("/lobby");
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const joinLobby = (userName) => {
+    console.log("Entrando a lobby...");
+    const newUser = {
+      socketId: socket.id,
+      userName,
+      isHost: false,
+    };
+    API.post("register", newUser).then(() => {
+      setUser(newUser);
       history.push("/lobby");
     });
+    // history.push("/lobby");
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
-
-    const nickName = nickNameRef.current.value;
-    if (nickName) {
-      createNewLobby();
+    const userName = nickNameRef.current.value;
+    if (userName) {
+      create_lobby ? createNewLobby(userName) : joinLobby(userName);
     } else {
       alert("Tu NickName no puede estar vacio!");
     }
@@ -48,7 +90,7 @@ function MainPage() {
           </Form.Group>
           <div className="align-self-center">
             <Button className="mt-2" type="submit" variant="light">
-              Crear Sala
+              {create_lobby ? "Crear sala" : "Unirse a sala"}
             </Button>
           </div>
         </Form>
@@ -56,5 +98,9 @@ function MainPage() {
     </div>
   );
 }
+
+MainPage.defaultProps = {
+  create_lobby: true,
+};
 
 export default MainPage;

@@ -1,19 +1,15 @@
 import React, { useEffect } from "react";
 import { useLobby } from "../../contexts/LobbyProvider";
 import { useHistory } from "react-router-dom";
-import HostDashBoard from "../hostDashBoard";
 import { useSocket } from "../../contexts/SocketProvider";
+import DashBoard from "../dashBoard";
 
 function Lobby() {
-  const socket = useSocket();
   const { lobby } = useLobby();
   const history = useHistory();
 
   useEffect(() => {
-    socket.on("user-joined", (user) => {
-      console.log("Usuario añadido a unsa sala", user);
-    });
-    if (lobby === null) {
+    if (!lobby) {
       history.push("/");
     }
   }, []);
@@ -21,7 +17,7 @@ function Lobby() {
   return (
     lobby && (
       <div>
-        <HostDashBoard />
+        <DashBoard />
       </div>
     )
   );

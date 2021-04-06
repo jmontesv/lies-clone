@@ -34,10 +34,8 @@ app.use(roomsRoutes);
 app.use(userRoutes);
 
 io.on("connection", (socket) => {
-  console.log("handshake established");
   socket.on("join-room", (idRoom, socketId) => {
     socket.join(idRoom);
-    console.log(`Agregando usuario a la sala ${idRoom + socketId}`);
     // Obtengo el usuario completo
     const user = users.find((user) => user.socketId === socketId);
     // Añado el usuario a la sala
@@ -48,6 +46,29 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnect", () => {
     console.log("Cerrando sesion", socket.id);
+    const userToDelete = users.find((user) => user.socketId === socket.id);
+    if (userToDelete) {
+      let roomIndex = -1;
+      let room = rooms.find((room, index) => {
+        roomIndex = index;
+        return room.id === userToDelete.roomId;
+      });
+      if (room) {
+        let newUsersList = room.users.filter(
+          (user) => user.socketId !== socket.id
+        );
+        room.users = newUsersList;
+        if (newUsersList.length > 0) {
+          if (userToDelete.isHost) newUsersList[0].isHost = true;
+          if (roomIndex >= 0) rooms[roomIndex].users = newUsersList;
+          io.to(userToDelete.roomId).emit(
+            "user-disconnected",
+            newUsersList,
+            userToDelete
+          );
+        }
+      }
+    }
   });
 });
 

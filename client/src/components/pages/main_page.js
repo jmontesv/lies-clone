@@ -38,6 +38,7 @@ function MainPage({ create_lobby }) {
       socketId: socket.id,
       userName,
       isHost: true,
+      roomId: lobbyId,
     };
     const newLobby = { id: lobbyId, invitationId, users: [] };
     Promise.all([API.post("/rooms", newLobby), API.post("/register", newUser)])
@@ -50,11 +51,11 @@ function MainPage({ create_lobby }) {
   };
 
   const joinLobby = (userName) => {
-    console.log("Entrando a lobby...");
     const newUser = {
       socketId: socket.id,
       userName,
       isHost: false,
+      roomId: lobby.id,
     };
     API.post("register", newUser).then(() => {
       setUser(newUser);

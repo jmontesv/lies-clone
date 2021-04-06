@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useLobby } from "../../contexts/LobbyProvider";
 import { useHistory } from "react-router-dom";
-import { useSocket } from "../../contexts/SocketProvider";
+import { useUser } from "../../contexts/UserProvider";
 import DashBoard from "../dashBoard";
 
 function Lobby() {

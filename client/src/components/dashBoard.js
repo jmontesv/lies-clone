@@ -24,10 +24,8 @@ function DashBoard() {
   return (
     <div>
       <h1>Lobby</h1>
-      <h2>{`Jugadores: ${users.length}`}</h2>
-      {users.map((user) => (
-        <p key={user.socketId}>{user.userName}</p>
-      ))}
+      <h2>{`Jugadores: ${users && users.length}`}</h2>
+      {users && users.map((user) => <p key={user.socketId}>{user.userName}</p>)}
       <div className="button_container d-flex">
         <Button variant="light" onClick={(e) => invite()}>
           Invitar

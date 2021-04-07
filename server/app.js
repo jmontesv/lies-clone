@@ -44,28 +44,26 @@ io.on("connection", (socket) => {
     });
     io.to(idRoom).emit("user-joined", user);
   });
-  socket.on("disconnect", () => {
+  socket.on("disconnecting", () => {
     console.log("Cerrando sesion", socket.id);
     const userToDelete = users.find((user) => user.socketId === socket.id);
     if (userToDelete) {
-      let roomIndex = -1;
-      let room = rooms.find((room, index) => {
-        roomIndex = index;
-        return room.id === userToDelete.roomId;
-      });
-      if (room) {
-        let newUsersList = room.users.filter(
-          (user) => user.socketId !== socket.id
-        );
-        room.users = newUsersList;
-        if (newUsersList.length > 0) {
-          if (userToDelete.isHost) newUsersList[0].isHost = true;
-          if (roomIndex >= 0) rooms[roomIndex].users = newUsersList;
-          io.to(userToDelete.roomId).emit(
-            "user-disconnected",
-            newUsersList,
-            userToDelete
-          );
+      for (const roomId of socket.rooms) {
+        if (roomId !== socket.id) {
+          let newUserList = [];
+          rooms.forEach((room) => {
+            if (room.id === roomId) {
+              room.users = room.users.filter(
+                (user) => user.socketId !== socket.id
+              );
+              if (userToDelete.isHost && room.users.length > 0) {
+                room.users[0].isHost = true;
+                io.to(roomId).emit("change-host", room.users[0]);
+              }
+              newUserList = [...room.users];
+            }
+          });
+          io.to(roomId).emit("user-disconnected", newUserList);
         }
       }
     }

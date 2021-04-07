@@ -1,18 +1,16 @@
 import React, { useEffect } from "react";
-import { useLobby } from "../contexts/LobbyProvider";
+import useLobby from "../hooks/useLobby";
 import { Button } from "react-bootstrap";
-import { useSocket } from "../contexts/SocketProvider";
-import { useUser } from "../contexts/UserProvider";
+import useSocket from "../hooks/useSocket";
 
 function DashBoard() {
   const socket = useSocket();
   const { lobby, users } = useLobby();
-  const { user } = useUser();
 
   useEffect(() => {
     if (socket == null) return;
 
-    socket.emit("join-room", lobby.id, user.socketId);
+    socket.emit("join-room", lobby.id, socket.id);
   }, []);
 
   const invite = () => {
@@ -25,9 +23,14 @@ function DashBoard() {
     <div>
       <h1>Lobby</h1>
       <h2>{`Jugadores: ${users && users.length}`}</h2>
-      {users && users.map((user) => <p key={user.socketId}>{user.userName}</p>)}
+      {users &&
+        users.map((user) => (
+          <p key={user.socketId}>
+            {user.userName}Es host: {user.isHost.toString()}
+          </p>
+        ))}
       <div className="button_container d-flex">
-        <Button variant="light" onClick={(e) => invite()}>
+        <Button variant="light" onClick={invite}>
           Invitar
         </Button>
         <Button variant="light" className="ml-2">

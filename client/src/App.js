@@ -1,11 +1,11 @@
 import React from "react";
 import "./App.css";
-import MainPage from "./components/pages/main_page";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { LobbyProvider } from "./contexts/LobbyProvider";
-import Lobby from "./components/pages/lobby";
-import { SocketProvider } from "./contexts/SocketProvider";
-import { UserProvider } from "./contexts/UserProvider";
+import LobbyProvider from "./contexts/LobbyProvider";
+import UserProvider from "./contexts/UserProvider";
+import SocketProvider from "./contexts/SocketProvider";
+import MainPage from "./pages/MainPage";
+import Lobby from "./pages/Lobby";
 
 function App() {
   return (
@@ -18,12 +18,11 @@ function App() {
                 <Route exact path="/">
                   <MainPage />
                 </Route>
-
-                <Route path="/lobby/">
+                <Route path="/lobby">
                   <Lobby />
                 </Route>
-                <Route path="/:invitationId?/">
-                  <MainPage create_lobby={false} />
+                <Route path="/:invitationId?">
+                  <MainPage createLobby={false} />
                 </Route>
               </Switch>
             </Router>

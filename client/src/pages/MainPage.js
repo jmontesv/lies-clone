@@ -2,17 +2,16 @@ import React, { useEffect, useRef } from "react";
 import { Form, FormControl, Button } from "react-bootstrap";
 import { useHistory, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import API from "../../axios";
-import { useLobby } from "../../contexts/LobbyProvider";
-import { useUser } from "../../contexts/UserProvider";
-import { useSocket } from "../../contexts/SocketProvider";
+import API from "../axios";
+import useLobby from "../hooks/useLobby";
+import useUser from "../hooks/useUser";
+import useSocket from "../hooks/useSocket";
 
-function MainPage({ create_lobby }) {
-  const nickNameRef = useRef(null);
-  const history = useHistory("");
+function MainPage({ createLobby = true }) {
+  const history = useHistory();
   const socket = useSocket();
   const { invitationId } = useParams();
-  const { lobby, setLobby, setUsers } = useLobby();
+  const { setLobby, setUsers } = useLobby();
   const { setUser } = useUser();
 
   useEffect(() => {
@@ -33,12 +32,10 @@ function MainPage({ create_lobby }) {
   const createNewLobby = (userName) => {
     const lobbyId = uuidv4();
     const invitationId = uuidv4();
-    const userId = uuidv4();
     const newUser = {
       socketId: socket.id,
       userName,
       isHost: true,
-      roomId: lobbyId,
     };
     const newLobby = { id: lobbyId, invitationId, users: [] };
     Promise.all([API.post("/rooms", newLobby), API.post("/register", newUser)])
@@ -55,23 +52,21 @@ function MainPage({ create_lobby }) {
       socketId: socket.id,
       userName,
       isHost: false,
-      roomId: lobby.id,
     };
     API.post("register", newUser).then(() => {
       setUser(newUser);
       history.push("/lobby");
     });
-    // history.push("/lobby");
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
-    const userName = nickNameRef.current.value;
-    if (userName) {
-      create_lobby ? createNewLobby(userName) : joinLobby(userName);
-    } else {
+    const userName = e.target.nickname.value;
+    if (!userName) {
       alert("Tu NickName no puede estar vacio!");
+      return;
     }
+    createLobby ? createNewLobby(userName) : joinLobby(userName);
   };
 
   return (
@@ -85,13 +80,13 @@ function MainPage({ create_lobby }) {
             <Form.Label>Nick Name</Form.Label>
             <FormControl
               type="text"
-              placeholder="MiNickName"
-              ref={nickNameRef}
+              placeholder="Introduce un nombre para jugar"
+              id="nickname"
             />
           </Form.Group>
           <div className="align-self-center">
             <Button className="mt-2" type="submit" variant="light">
-              {create_lobby ? "Crear sala" : "Unirse a sala"}
+              {createLobby ? "Crear sala" : "Unirse a sala"}
             </Button>
           </div>
         </Form>
@@ -99,9 +94,5 @@ function MainPage({ create_lobby }) {
     </div>
   );
 }
-
-MainPage.defaultProps = {
-  create_lobby: true,
-};
 
 export default MainPage;
